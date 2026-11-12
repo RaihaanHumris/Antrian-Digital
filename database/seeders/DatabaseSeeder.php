@@ -9,34 +9,29 @@ use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Mengisi data awal akun Administrator dan contoh antrian pasien hari ini.
+     */
     public function run(): void
     {
-        // Matikan sementara pengecekan foreign key agar bisa dibersihkan
+        // 1. Bersihkan data lama dengan aman
         Schema::disableForeignKeyConstraints();
         DB::table('antrians')->truncate();
         DB::table('users')->truncate();
         Schema::enableForeignKeyConstraints();
 
-        // 1. Buat 1 Akun Admin Saja
-        $dataAdmin = [
+        // 2. Buat 1 Akun Administrator Utama
+        $adminId = DB::table('users')->insertGetId([
             'name'       => 'Admin Klinik',
-            'email'      => 'admin@medik.id',
+            'email'      => 'admin@medika.id',
             'password'   => Hash::make('password123'),
+            'peran'      => 'admin',
+            'nama_loket' => 'Loket Utama',
             'created_at' => now(),
             'updated_at' => now(),
-        ];
+        ]);
 
-        // Cek otomatis: jika di tabel users Anda ada kolom 'peran' dan 'nama_loket', ikut diisi
-        if (Schema::hasColumn('users', 'peran')) {
-            $dataAdmin['peran'] = 'admin';
-        }
-        if (Schema::hasColumn('users', 'nama_loket')) {
-            $dataAdmin['nama_loket'] = 'Loket Utama';
-        }
-
-        $adminId = DB::table('users')->insertGetId($dataAdmin);
-
-        // 2. Buat 3 Data Antrian Awal untuk Hari Ini
+        // 3. Buat Data Antrian Awal untuk Hari Ini
         $hariIni = now()->toDateString();
         $daftarPasien = [
             ['nama' => 'Ahmad Fauzi', 'poli' => 'Poli Umum'],
@@ -47,29 +42,19 @@ class DatabaseSeeder extends Seeder
         foreach ($daftarPasien as $index => $pasien) {
             $urut = $index + 1;
 
-            $dataAntrian = [
+            DB::table('antrians')->insert([
                 'nomor_urut'      => $urut,
                 'kode_antrian'    => 'A-' . str_pad($urut, 3, '0', STR_PAD_LEFT),
                 'nama_pasien'     => $pasien['nama'],
+                'jenis_poli'      => $pasien['poli'],
                 'status'          => $urut === 1 ? 'dipanggil' : 'menunggu',
                 'tanggal_antrian' => $hariIni,
+                'diinput_oleh'    => $adminId,
+                'dilayani_oleh'   => $urut === 1 ? $adminId : null,
                 'waktu_dipanggil' => $urut === 1 ? now() : null,
                 'created_at'      => now(),
                 'updated_at'      => now(),
-            ];
-
-            // Cek otomatis ketersediaan kolom opsional di tabel antrians
-            if (Schema::hasColumn('antrians', 'jenis_poli')) {
-                $dataAntrian['jenis_poli'] = $pasien['poli'];
-            }
-            if (Schema::hasColumn('antrians', 'diinput_oleh')) {
-                $dataAntrian['diinput_oleh'] = $adminId;
-            }
-            if (Schema::hasColumn('antrians', 'dilayani_oleh')) {
-                $dataAntrian['dilayani_oleh'] = $urut === 1 ? $adminId : null;
-            }
-
-            DB::table('antrians')->insert($dataAntrian);
+            ]);
         }
     }
 }

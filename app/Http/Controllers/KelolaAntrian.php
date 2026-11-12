@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class KelolaAntrian extends Controller
 {
     /**
-     * 1. Menampilkan halaman form login untuk Admin & Petugas.
+     * 1. Menampilkan halaman form login khusus Administrator (Admin).
      */
     public function halamanLogin()
     {
@@ -19,7 +19,7 @@ class KelolaAntrian extends Controller
     }
 
     /**
-     * 2. Memproses autentikasi login Admin & Petugas.
+     * 2. Memproses autentikasi login Administrator.
      */
     public function prosesLogin(Request $request): RedirectResponse
     {
@@ -39,7 +39,7 @@ class KelolaAntrian extends Controller
     }
 
     /**
-     * 3. Memproses logout / keluar dari sesi.
+     * 3. Memproses logout / keluar dari sesi login Admin.
      */
     public function keluar(Request $request): RedirectResponse
     {
@@ -51,28 +51,32 @@ class KelolaAntrian extends Controller
     }
 
     /**
-     * 4. Menampilkan halaman dashboard untuk Admin dan Petugas.
+     * 4. Menampilkan halaman dashboard kendali antrian untuk Admin.
      */
     public function tampilDashboard()
     {
         $hariIni = now()->toDateString();
 
         // Cari antrian yang sedang aktif dipanggil saat ini
-        $antrianAktif = Antrian::where('tanggal_antrian', $hariIni)
-            ->where('status', 'dipanggil')
+        $antrianAktif = Antrian::where('status', 'dipanggil')
+            ->orderByDesc('waktu_dipanggil')
+            ->orderByDesc('id')
             ->first();
 
-        // Ambil semua daftar antrian hari ini beserta relasi petugasnya
-        $daftarAntrian = Antrian::with(['petugasPelayan', 'petugasPenginput'])
-            ->where('tanggal_antrian', $hariIni)
+        // Ambil daftar antrian hari ini (atau seluruh antrian jika tanggal beda hari)
+        $daftarAntrian = Antrian::whereDate('tanggal_antrian', $hariIni)
             ->orderBy('nomor_urut', 'asc')
             ->get();
+
+        if ($daftarAntrian->isEmpty()) {
+            $daftarAntrian = Antrian::orderBy('nomor_urut', 'asc')->get();
+        }
 
         return view('admin.dashboard_antrian', compact('antrianAktif', 'daftarAntrian'));
     }
 
     /**
-     * 5. Fitur Petugas/Admin untuk menambah/menginput antrian pasien baru.
+     * 5. Fitur Admin untuk menambah antrian pasien baru secara manual dari meja loket.
      */
     public function tambahAntrianManual(Request $request): RedirectResponse
     {
@@ -84,11 +88,12 @@ class KelolaAntrian extends Controller
         $hariIni = now()->toDateString();
 
         DB::transaction(function () use ($dataValid, $hariIni) {
-            $nomorTerakhir = Antrian::where('tanggal_antrian', $hariIni)
+            $terakhir = Antrian::where('tanggal_antrian', $hariIni)
+                ->orderByDesc('nomor_urut')
                 ->lockForUpdate()
-                ->max('nomor_urut') ?? 0;
+                ->first();
 
-            $nomorBaru = $nomorTerakhir + 1;
+            $nomorBaru = $terakhir ? ($terakhir->nomor_urut + 1) : 1;
 
             Antrian::create([
                 'nomor_urut'      => $nomorBaru,
@@ -105,32 +110,44 @@ class KelolaAntrian extends Controller
     }
 
     /**
-     * 6. Tombol NEXT (Selanjutnya):
-     * Menyelesaikan antrian yang sedang dipanggil, lalu memanggil nomor urut berikutnya.
+     * 6. Tombol SELESAI:
+     * Menyelesaikan pelayanan nomor antrian yang sedang aktif dipanggil.
+     * Setelah pasien selesai dilayani, status antrian berubah menjadi 'selesai',
+     * dan Admin siap memanggil nomor antrian berikutnya.
+     */
+    public function selesaikanAntrian($id): RedirectResponse
+    {
+        $antrian = Antrian::findOrFail($id);
+
+        $antrian->update([
+            'status' => 'selesai',
+        ]);
+
+        return back()->with('pesan_sukses', "Antrian {$antrian->kode_antrian} ({$antrian->nama_pasien}) telah selesai dilayani.");
+    }
+
+    /**
+     * 7. Tombol NEXT (Lanjutkan Nomor Antrian Berikutnya):
+     * - Jika ada nomor yang sedang dipanggil dan belum diselesaikan, selesaikan otomatis.
+     * - Panggil antrian berikutnya yang masih berstatus 'menunggu' urut dari nomor urut terkecil.
      */
     public function panggilSelanjutnya(): RedirectResponse
     {
         $hariIni = now()->toDateString();
 
-        DB::transaction(function () use ($hariIni) {
-            $sedangDipanggil = Antrian::where('tanggal_antrian', $hariIni)
-                ->where('status', 'dipanggil')
-                ->first();
+        $pesan = '';
 
+        DB::transaction(function () use ($hariIni, &$pesan) {
+            // Selesaikan antrian aktif saat ini jika masih ada
+            $sedangDipanggil = Antrian::where('status', 'dipanggil')->first();
             if ($sedangDipanggil) {
                 $sedangDipanggil->update(['status' => 'selesai']);
-
-                $antrianBerikutnya = Antrian::where('tanggal_antrian', $hariIni)
-                    ->where('nomor_urut', '>', $sedangDipanggil->nomor_urut)
-                    ->whereIn('status', ['menunggu', 'dilewati'])
-                    ->orderBy('nomor_urut', 'asc')
-                    ->first();
-            } else {
-                $antrianBerikutnya = Antrian::where('tanggal_antrian', $hariIni)
-                    ->where('status', 'menunggu')
-                    ->orderBy('nomor_urut', 'asc')
-                    ->first();
             }
+
+            // Ambil antrian berikutnya yang berstatus 'menunggu'
+            $antrianBerikutnya = Antrian::where('status', 'menunggu')
+                ->orderBy('nomor_urut', 'asc')
+                ->first();
 
             if ($antrianBerikutnya) {
                 $antrianBerikutnya->update([
@@ -138,35 +155,44 @@ class KelolaAntrian extends Controller
                     'dilayani_oleh'   => Auth::id(),
                     'waktu_dipanggil' => now(),
                 ]);
+                $pesan = "Berhasil memanggil nomor {$antrianBerikutnya->kode_antrian} ({$antrianBerikutnya->nama_pasien}).";
+            } else {
+                $pesan = "Semua antrian yang menunggu telah selesai.";
             }
         });
 
-        return back()->with('pesan_sukses', 'Berhasil memanggil nomor antrian selanjutnya.');
+        return back()->with('pesan_sukses', $pesan);
     }
 
     /**
-     * 7. Tombol PREV (Sebelumnya):
-     * Mengembalikan antrian saat ini menjadi 'menunggu', lalu memanggil ulang nomor sebelumnya.
+     * 8. Tombol PREV (Sebelumnya):
+     * Memanggil kembali nomor antrian sebelumnya jika diperlukan.
      */
     public function panggilSebelumnya(): RedirectResponse
     {
-        $hariIni = now()->toDateString();
-
-        DB::transaction(function () use ($hariIni) {
-            $sedangDipanggil = Antrian::where('tanggal_antrian', $hariIni)
-                ->where('status', 'dipanggil')
-                ->first();
+        DB::transaction(function () {
+            $sedangDipanggil = Antrian::where('status', 'dipanggil')->first();
 
             if ($sedangDipanggil) {
-                $antrianSebelumnya = Antrian::where('tanggal_antrian', $hariIni)
-                    ->where('nomor_urut', '<', $sedangDipanggil->nomor_urut)
+                $antrianSebelumnya = Antrian::where('nomor_urut', '<', $sedangDipanggil->nomor_urut)
                     ->orderByDesc('nomor_urut')
                     ->first();
 
                 if ($antrianSebelumnya) {
                     $sedangDipanggil->update(['status' => 'menunggu']);
-
                     $antrianSebelumnya->update([
+                        'status'          => 'dipanggil',
+                        'dilayani_oleh'   => Auth::id(),
+                        'waktu_dipanggil' => now(),
+                    ]);
+                }
+            } else {
+                $antrianTerakhir = Antrian::whereIn('status', ['selesai', 'dilewati'])
+                    ->orderByDesc('waktu_dipanggil')
+                    ->first();
+
+                if ($antrianTerakhir) {
+                    $antrianTerakhir->update([
                         'status'          => 'dipanggil',
                         'dilayani_oleh'   => Auth::id(),
                         'waktu_dipanggil' => now(),
@@ -175,10 +201,12 @@ class KelolaAntrian extends Controller
             }
         });
 
-        return back()->with('pesan_sukses', 'Kembali memanggil nomor antrian sebelumnya.');
+        return back()->with('pesan_sukses', 'Memanggil kembali antrian sebelumnya.');
     }
+
     /**
-     * 8. Tombol Lewati (Skip) jika pasien dipanggil tapi tidak hadir.
+     * 9. Tombol LEWATI (Skip):
+     * Menandai pasien yang tidak hadir saat dipanggil menjadi status 'dilewati'.
      */
     public function lewatiAntrian($id): RedirectResponse
     {
@@ -193,18 +221,15 @@ class KelolaAntrian extends Controller
     }
 
     /**
-     * 9. Tombol Hapus Antrian.
+     * 10. Tombol HAPUS Antrian:
      */
     public function hapusAntrian($id): RedirectResponse
     {
         $antrian = Antrian::findOrFail($id);
         $kode = $antrian->kode_antrian;
-        
+
         $antrian->delete();
 
         return back()->with('pesan_sukses', "Antrian {$kode} berhasil dihapus.");
     }
-
 }
-
-?>

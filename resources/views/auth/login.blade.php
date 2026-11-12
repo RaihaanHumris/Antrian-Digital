@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otentikasi Petugas</title>
+    <title>Otentikasi Administrator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,8 +52,8 @@
             <div>
                 <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
                     <div>
-                        <h2 class="text-base font-bold uppercase tracking-wider text-slate-900">Login Operator</h2>
-                        <p class="text-xs text-slate-500">Masukkan kredensial petugas loket atau admin</p>
+                        <h2 class="text-base font-bold uppercase tracking-wider text-slate-900">Login Administrator</h2>
+                        <p class="text-xs text-slate-500">Masukkan email dan kata sandi akun admin</p>
                     </div>
                     <span class="font-mono-num text-[11px] bg-slate-100 border border-slate-200 px-2 py-1 text-slate-600">AUTH</span>
                 </div>
@@ -131,15 +131,6 @@
             document.getElementById('email').value = 'admin@medik.id';
             document.getElementById('password').value = 'password123';
         }
-
-        @if ($errors->any())
-            Swal.fire({
-                title: 'Login gagal',
-                text: @json($errors->first()),
-                icon: 'error',
-                confirmButtonText: 'Coba lagi',
-            });
-        @endif
     </script>
 </body>
 </html>

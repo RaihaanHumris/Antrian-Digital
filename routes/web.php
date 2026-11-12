@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AntrianPublik;
 use App\Http\Controllers\KelolaAntrian;
 
-// 1. Rute Halaman Publik (Pengunjung)
+// 1. Rute Halaman Publik (Pengunjung & Layar TV Monitor)
 Route::get('/', [AntrianPublik::class, 'halamanUtama'])->name('publik.utama');
 Route::get('/api/data-antrian', [AntrianPublik::class, 'ambilDataRealtime'])->name('publik.data');
 Route::post('/api/ambil-antrian', [AntrianPublik::class, 'ambilNomorMandiri'])->name('publik.ambil');
@@ -16,14 +16,17 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/logout', [KelolaAntrian::class, 'keluar'])->middleware('auth')->name('logout');
 
-// 3. Rute Panel Admin (Menggunakan {id} agar tidak terkena 404 Route Model Binding)
+// 3. Rute Panel Kendali Antrian (Khusus Administrator)
 Route::prefix('panel')->name('panel.')->middleware('auth')->group(function () {
     Route::get('/dashboard', [KelolaAntrian::class, 'tampilDashboard'])->name('dashboard');
     Route::post('/antrian/tambah', [KelolaAntrian::class, 'tambahAntrianManual'])->name('antrian.tambah');
     Route::post('/antrian/selanjutnya', [KelolaAntrian::class, 'panggilSelanjutnya'])->name('antrian.selanjutnya');
     Route::post('/antrian/sebelumnya', [KelolaAntrian::class, 'panggilSebelumnya'])->name('antrian.sebelumnya');
     
-    // Gunakan {id} dan dukung method PATCH/POST serta DELETE/POST
+    // Rute tombol 'Selesai' untuk menyelesaikan pelayanan antrian aktif
+    Route::match(['patch', 'post'], '/antrian/{id}/selesai', [KelolaAntrian::class, 'selesaikanAntrian'])->name('antrian.selesai');
+
+    // Rute tombol Lewati (Skip) dan Hapus
     Route::match(['patch', 'post'], '/antrian/{id}/lewati', [KelolaAntrian::class, 'lewatiAntrian'])->name('antrian.lewati');
     Route::match(['delete', 'post'], '/antrian/{id}/hapus', [KelolaAntrian::class, 'hapusAntrian'])->name('antrian.hapus');
 });

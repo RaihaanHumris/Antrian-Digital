@@ -9,6 +9,10 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    /**
+     * Atribut yang dapat diisi massal.
+     * Sistem kini hanya menggunakan satu peran yaitu Administrator (Admin).
+     */
     protected $fillable = [
         'name',
         'email',
@@ -22,9 +26,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // Fungsi cek apakah user adalah Admin
+    /**
+     * Helper untuk memeriksa status admin.
+     * Seluruh akun yang terdaftar pada sistem diperlakukan sebagai Administrator.
+     */
     public function apakahAdmin(): bool
     {
-        return $this->peran === 'admin';
+        return $this->peran === 'admin' || empty($this->peran);
     }
 }

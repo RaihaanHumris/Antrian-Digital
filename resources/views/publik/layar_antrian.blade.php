@@ -16,7 +16,7 @@
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col pb-24 lg:pb-0">
 
-    <!-- TOP BAR: Minimalist Hospital Signage Header -->
+    <!-- TOP BAR: Signage Header -->
     <header class="bg-white border-b border-slate-200 px-4 lg:px-8 h-14 lg:h-16 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-3 h-3 bg-emerald-600"></div>
@@ -29,18 +29,18 @@
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs font-mono-num text-slate-700">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                <span id="jam-server">--:--:--</span>
+                <span id="jam-server">{{ now()->format('H:i:s') }}</span>
             </div>
             <a href="{{ route('panel.dashboard') }}" class="text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-300 px-3 py-1.5 hover:bg-slate-50 transition">
-                Panel Petugas
+                Panel Admin
             </a>
         </div>
     </header>
 
-    <!-- MAIN WORKSPACE: Berbeda Struktur untuk Mobile & Desktop -->
+    <!-- MAIN WORKSPACE -->
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 lg:divide-x lg:divide-slate-200 lg:overflow-hidden">
 
-        <!-- KOLOM KIRI (5/12 Desktop): Papan Panggilan Utama & Form Kiosk Desktop -->
+        <!-- KOLOM KIRI: Papan Panggilan Aktif & Form Kiosk Desktop -->
         <section class="lg:col-span-5 flex flex-col justify-between bg-white p-5 lg:p-8 border-b lg:border-b-0 border-slate-200">
             
             <!-- Papan Nomor Panggilan Aktif -->
@@ -48,23 +48,23 @@
                 <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                     <span class="text-[11px] font-mono-num uppercase tracking-widest text-slate-400">Panggilan Aktif</span>
                     <span id="teks-info-loket" class="text-xs font-mono-num font-bold uppercase px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        LOKET UTAMA
+                        {{ $antrianSekarang ? 'LOKET UTAMA' : 'STANDBY' }}
                     </span>
                 </div>
 
                 <div class="my-8 lg:my-auto py-4">
                     <div id="teks-kode-antrian" class="font-mono-num text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white leading-none">
-                        ---
+                        {{ $antrianSekarang ? $antrianSekarang->kode_antrian : '---' }}
                     </div>
                     <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
                         <div>
                             <span class="block text-[10px] uppercase tracking-wider text-slate-400">Nama Pasien</span>
                             <p id="teks-nama-pasien" class="text-base lg:text-xl font-semibold text-slate-100 mt-0.5">
-                                Belum ada panggilan aktif
+                                {{ $antrianSekarang ? $antrianSekarang->nama_pasien : 'Belum ada panggilan aktif' }}
                             </p>
                         </div>
                         <span id="teks-poli-aktif" class="text-xs font-mono-num text-slate-300 border border-slate-700 px-2.5 py-1">
-                            -
+                            {{ $antrianSekarang ? ($antrianSekarang->jenis_poli ?? 'Poli Umum') : '-' }}
                         </span>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800 text-xs">
                     <div>
                         <span class="text-slate-400 block">Antrian Menunggu</span>
-                        <span id="angka-menunggu" class="font-mono-num text-lg font-bold text-white">0</span>
+                        <span id="angka-menunggu" class="font-mono-num text-lg font-bold text-white">{{ $jumlahMenunggu ?? 0 }}</span>
                     </div>
                     <div class="text-right">
                         <span class="text-slate-400 block">Pembaruan</span>
@@ -82,7 +82,7 @@
                 </div>
             </div>
 
-            <!-- FORM AMBIL TIKET KHUSUS DESKTOP (Disembunyikan di Mobile karena Mobile pakai Sticky Bottom Drawer) -->
+            <!-- FORM AMBIL TIKET MANDIRI (Desktop) -->
             <div class="hidden lg:block mt-6 pt-6 border-t border-slate-200">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Registrasi Mandiri (Kiosk)</h2>
@@ -108,7 +108,7 @@
 
         </section>
 
-        <!-- KOLOM KANAN (7/12 Desktop): Daftar Antrian (Tabel di Desktop, Card List di Mobile) -->
+        <!-- KOLOM KANAN: Daftar Antrian (Tabel Desktop / Card List Mobile) -->
         <section class="lg:col-span-7 flex flex-col bg-[#F8FAFC] lg:overflow-hidden">
             
             <div class="px-4 lg:px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
@@ -119,7 +119,7 @@
                 <span class="text-xs font-mono-num text-slate-500">{{ now()->format('d/m/Y') }}</span>
             </div>
 
-            <!-- 1. TAMPILAN DESKTOP: Tabel Data Presisi (Hanya muncul di layar lg ke atas) -->
+            <!-- 1. TAMPILAN DESKTOP -->
             <div class="hidden lg:block flex-1 overflow-y-auto bg-white">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-100 border-b border-slate-200 text-[11px] font-mono-num uppercase text-slate-500 sticky top-0">
@@ -132,23 +132,68 @@
                         </tr>
                     </thead>
                     <tbody id="tabel-antrian-desktop" class="divide-y divide-slate-200 text-sm">
-                        <tr>
-                            <td colspan="5" class="py-12 text-center text-slate-400 text-xs font-mono-num">MEMUAT DATA ANTRIAN...</td>
-                        </tr>
+                        @forelse($daftarAntrian as $item)
+                            <tr class="{{ $item->status === 'dipanggil' ? 'bg-emerald-50/90 font-semibold' : 'hover:bg-slate-50' }}">
+                                <td class="py-3.5 px-6 font-mono-num font-bold text-slate-900">{{ $item->kode_antrian }}</td>
+                                <td class="py-3.5 px-6 text-slate-800">{{ $item->nama_pasien }}</td>
+                                <td class="py-3.5 px-6 text-xs text-slate-600">{{ $item->jenis_poli ?? 'Poli Umum' }}</td>
+                                <td class="py-3.5 px-6">
+                                    @if($item->status === 'dipanggil')
+                                        <span class="inline-block font-mono-num text-[11px] font-bold uppercase px-2 py-0.5 bg-emerald-600 text-white">DIPANGGIL</span>
+                                    @elseif($item->status === 'menunggu')
+                                        <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>
+                                    @elseif($item->status === 'selesai')
+                                        <span class="inline-block font-mono-num text-[11px] uppercase px-2 py-0.5 bg-slate-100 text-slate-500">SELESAI</span>
+                                    @else
+                                        <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-rose-100 text-rose-800">DILEWATI</span>
+                                    @endif
+                                </td>
+                                <td class="py-3.5 px-6 text-right font-mono-num text-xs text-slate-500">
+                                    {{ $item->waktu_dipanggil ? \Carbon\Carbon::parse($item->waktu_dipanggil)->format('H:i') : '--:--' }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-12 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <!-- 2. TAMPILAN MOBILE: Kartu Tiket Vertikal (Hanya muncul di HP/Tablet kecil) -->
+            <!-- 2. TAMPILAN MOBILE -->
             <div id="list-antrian-mobile" class="lg:hidden p-4 space-y-2.5">
-                <div class="py-10 text-center text-slate-400 text-xs font-mono-num">MEMUAT DATA ANTRIAN...</div>
+                @forelse($daftarAntrian as $item)
+                    <div class="border {{ $item->status === 'dipanggil' ? 'border-l-4 border-l-emerald-600 border-slate-300 bg-emerald-50/40' : 'border-slate-200 bg-white' }} p-3.5 flex items-center justify-between">
+                        <div class="flex items-center gap-3.5">
+                            <span class="font-mono-num text-lg font-extrabold text-slate-900">{{ $item->kode_antrian }}</span>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-800 leading-tight">{{ $item->nama_pasien }}</p>
+                                <span class="text-[11px] text-slate-500">{{ $item->jenis_poli ?? 'Poli Umum' }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            @if($item->status === 'dipanggil')
+                                <span class="inline-block font-mono-num text-[11px] font-bold uppercase px-2 py-0.5 bg-emerald-600 text-white">DIPANGGIL</span>
+                            @elseif($item->status === 'menunggu')
+                                <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>
+                            @elseif($item->status === 'selesai')
+                                <span class="inline-block font-mono-num text-[11px] uppercase px-2 py-0.5 bg-slate-100 text-slate-500">SELESAI</span>
+                            @else
+                                <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-rose-100 text-rose-800">DILEWATI</span>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-10 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</div>
+                @endforelse
             </div>
 
         </section>
 
     </main>
 
-    <!-- STICKY BOTTOM BAR & MODAL KHUSUS MOBILE (Tidak tampil di Desktop) -->
+    <!-- STICKY BOTTOM BAR (Mobile) -->
     <div class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-300 p-3 z-30 flex items-center justify-between gap-3">
         <div class="pl-1">
             <span class="block text-[10px] uppercase tracking-wider text-slate-400">Ingin Berobat?</span>
@@ -159,7 +204,7 @@
         </button>
     </div>
 
-    <!-- Modal Drawer Mobile untuk Ambil Antrian -->
+    <!-- Modal Drawer Mobile -->
     <div id="modal-ambil-mobile" class="lg:hidden fixed inset-0 bg-slate-900/60 z-40 hidden items-end">
         <div class="bg-white w-full p-5 border-t-2 border-slate-900">
             <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200">
@@ -189,7 +234,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- SCRIPT REALTIME FETCH & SUBMIT -->
     <script>
         let kodeTerakhirDipanggil = null;
 
@@ -219,6 +263,8 @@
                 const respon = await fetch("{{ route('publik.data') }}", {
                     headers: { 'Accept': 'application/json' }
                 });
+                if (!respon.ok) return;
+
                 const data = await respon.json();
 
                 document.getElementById('jam-server').textContent = data.jam_server;
@@ -230,11 +276,12 @@
                 const elLoket = document.getElementById('teks-info-loket');
                 const elKartu = document.getElementById('kartu-panggilan');
 
+                // Saat ada nomor yang sedang DIPANGGIL, langsung tampilkan di layar publik
                 if (data.antrian_sekarang) {
                     elKode.textContent = data.antrian_sekarang.kode_antrian;
                     elPasien.textContent = data.antrian_sekarang.nama_pasien || 'Pasien Umum';
                     elPoli.textContent = data.antrian_sekarang.jenis_poli || 'Poli Umum';
-                    elLoket.textContent = data.antrian_sekarang.petugas_pelayan?.nama_loket || 'LOKET 1';
+                    elLoket.textContent = 'LOKET UTAMA';
 
                     if (kodeTerakhirDipanggil !== data.antrian_sekarang.kode_antrian) {
                         kodeTerakhirDipanggil = data.antrian_sekarang.kode_antrian;
@@ -320,10 +367,7 @@
             });
 
             const hasil = await res.json();
-            if (!res.ok) {
-                throw new Error(hasil.message || hasil.pesan || 'Nomor antrian gagal diambil. Silakan coba lagi.');
-            }
-
+            if (!res.ok) throw new Error(hasil.pesan || hasil.message || 'Gagal mengambil nomor antrian');
             muatDataAntrian();
             return hasil;
         }
@@ -346,7 +390,6 @@
             });
         }
 
-        // Listener Form Desktop
         document.getElementById('form-ambil-desktop').addEventListener('submit', async function (e) {
             e.preventDefault();
             const namaEl = document.getElementById('nama_pasien_desktop');
@@ -360,7 +403,6 @@
             }
         });
 
-        // Listener Form Mobile
         document.getElementById('form-ambil-mobile').addEventListener('submit', async function (e) {
             e.preventDefault();
             const namaEl = document.getElementById('nama_pasien_mobile');

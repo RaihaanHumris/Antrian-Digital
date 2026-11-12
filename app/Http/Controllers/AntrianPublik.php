@@ -10,30 +10,50 @@ use Illuminate\Support\Facades\DB;
 class AntrianPublik extends Controller
 {
     /**
-     * Menampilkan halaman utama monitor antrian untuk pengunjung.
+     * Menampilkan halaman utama monitor antrian untuk pengunjung / display TV.
+     * Mengirimkan data awal (initial data) agar saat pertama kali dibuka langsung tampil tanpa menunggu jeda AJAX.
      */
     public function halamanUtama()
     {
-        return view('publik.layar_antrian');
+        $hariIni = now()->toDateString();
+
+        // Cari nomor antrian yang saat ini berstatus 'dipanggil'
+        $antrianSekarang = Antrian::where('status', 'dipanggil')
+            ->orderByDesc('waktu_dipanggil')
+            ->orderByDesc('id')
+            ->first();
+
+        // Ambil semua daftar antrian hari ini
+        $daftarAntrian = Antrian::whereDate('tanggal_antrian', $hariIni)
+            ->orderBy('nomor_urut', 'asc')
+            ->get();
+
+        // Fallback jika database belum ada filter tanggal hari ini
+        if ($daftarAntrian->isEmpty()) {
+            $daftarAntrian = Antrian::orderBy('nomor_urut', 'asc')->get();
+        }
+
+        $jumlahMenunggu = $daftarAntrian->where('status', 'menunggu')->count();
+
+        return view('publik.layar_antrian', compact('antrianSekarang', 'daftarAntrian', 'jumlahMenunggu'));
     }
 
     /**
-     * Mengirimkan data antrian terbaru dalam bentuk JSON.
-     * Fungsi ini dipanggil otomatis setiap 2 detik oleh JavaScript (Realtime tanpa refresh).
+     * Mengambil data antrian terkini dalam format JSON.
+     * Dipanggil otomatis tiap 2 detik oleh browser pengunjung (AJAX Polling Realtime).
      */
     public function ambilDataRealtime(): JsonResponse
     {
         $hariIni = now()->toDateString();
 
-        // 1. Cari 1 nomor antrian yang sedang berstatus 'dipanggil' hari ini
-        $antrianSekarang = Antrian::with('petugasPelayan:id,name,nama_loket')
-            ->where('tanggal_antrian', $hariIni)
-            ->where('status', 'dipanggil')
+        // 1. Ambil nomor antrian yang saat ini aktif berstatus 'dipanggil'
+        $antrianSekarang = Antrian::where('status', 'dipanggil')
             ->orderByDesc('waktu_dipanggil')
+            ->orderByDesc('id')
             ->first();
 
-        // 2. Ambil seluruh daftar antrian hari ini diurutkan dari nomor urut terkecil
-        $daftarAntrian = Antrian::where('tanggal_antrian', $hariIni)
+        // 2. Ambil seluruh daftar antrian hari ini
+        $daftarAntrian = Antrian::whereDate('tanggal_antrian', $hariIni)
             ->orderBy('nomor_urut', 'asc')
             ->get([
                 'id',
@@ -45,7 +65,20 @@ class AntrianPublik extends Controller
                 'waktu_dipanggil'
             ]);
 
-        // 3. Hitung berapa antrian yang masih berstatus 'menunggu'
+        // Fallback jika belum ada filter tanggal yang sama persis
+        if ($daftarAntrian->isEmpty()) {
+            $daftarAntrian = Antrian::orderBy('nomor_urut', 'asc')->get([
+                'id',
+                'nomor_urut',
+                'kode_antrian',
+                'nama_pasien',
+                'jenis_poli',
+                'status',
+                'waktu_dipanggil'
+            ]);
+        }
+
+        // 3. Hitung jumlah antrian yang masih berstatus 'menunggu'
         $jumlahMenunggu = $daftarAntrian->where('status', 'menunggu')->count();
 
         return response()->json([
@@ -57,19 +90,19 @@ class AntrianPublik extends Controller
     }
 
     /**
-     * Fitur ketika pengunjung mengambil nomor antrian sendiri dari halaman depan.
+     * Fitur pendaftaran tiket mandiri oleh pengunjung / pasien dari layar publik atau HP.
      */
     public function ambilNomorMandiri(Request $request): JsonResponse
     {
         $hariIni = now()->toDateString();
 
         $antrianBaru = DB::transaction(function () use ($request, $hariIni) {
-            // Cari angka nomor_urut paling besar hari ini, kalau belum ada mulai dari 0
-            $nomorTerakhir = Antrian::where('tanggal_antrian', $hariIni)
+            $terakhir = Antrian::where('tanggal_antrian', $hariIni)
+                ->orderByDesc('nomor_urut')
                 ->lockForUpdate()
-                ->max('nomor_urut') ?? 0;
+                ->first();
 
-            $nomorBerikutnya = $nomorTerakhir + 1;
+            $nomorBerikutnya = $terakhir ? ($terakhir->nomor_urut + 1) : 1;
 
             return Antrian::create([
                 'nomor_urut'      => $nomorBerikutnya,
@@ -78,7 +111,7 @@ class AntrianPublik extends Controller
                 'jenis_poli'      => $request->input('jenis_poli', 'Poli Umum'),
                 'status'          => 'menunggu',
                 'tanggal_antrian' => $hariIni,
-                'diinput_oleh'    => null, // Kosong karena pasien ambil sendiri di layar publik
+                'diinput_oleh'    => null,
             ]);
         });
 
