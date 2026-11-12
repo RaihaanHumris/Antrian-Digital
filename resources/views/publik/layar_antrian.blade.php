@@ -249,13 +249,13 @@
         }
 
         function labelStatus(status) {
-            const peta = {
+            const info = {
                 'dipanggil': '<span class="inline-block font-mono-num text-[11px] font-bold uppercase px-2 py-0.5 bg-emerald-600 text-white">DIPANGGIL</span>',
                 'menunggu': '<span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>',
                 'selesai': '<span class="inline-block font-mono-num text-[11px] uppercase px-2 py-0.5 bg-slate-100 text-slate-500">SELESAI</span>',
                 'dilewati': '<span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-rose-100 text-rose-800">DILEWATI</span>'
             };
-            return peta[status] || status;
+            return info[status] || status;
         }
 
         async function muatDataAntrian() {
