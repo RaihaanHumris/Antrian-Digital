@@ -1,0 +1,150 @@
+<mxfile host="app.diagrams.net" modified="2026-11-12T13:38:00.000Z" agent="Antigravity" version="24.0.0" type="device">
+  <diagram id="er-antrian-online" name="ERD Sistem Antrian Online">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- JUDUL DIAGRAM -->
+        <mxCell id="title" value="Entity Relationship Diagram (ERD) - Sistem Antrian Online" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="320" y="30" width="520" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ================= TABEL USERS ================= -->
+        <mxCell id="tbl_users" value="users (Administrator)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#0f172a;fontColor=#ffffff;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="280" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_1" value="+ id : BIGINT UNSIGNED [PK]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="tbl_users">
+          <mxGeometry y="30" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_2" value="  name : VARCHAR(255)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_users">
+          <mxGeometry y="56" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_3" value="  email : VARCHAR(255) [UNIQUE]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_users">
+          <mxGeometry y="82" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_4" value="  password : VARCHAR(255)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_users">
+          <mxGeometry y="108" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_5" value="  peran : VARCHAR(50) = 'admin'" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_users">
+          <mxGeometry y="134" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_6" value="  nama_loket : VARCHAR(100) = 'Loket Utama'" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_users">
+          <mxGeometry y="160" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_7" value="  remember_token : VARCHAR(100)" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_users">
+          <mxGeometry y="186" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u_col_8" value="  created_at / updated_at : TIMESTAMP" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_users">
+          <mxGeometry y="212" width="280" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- ================= TABEL ANTRIANS ================= -->
+        <mxCell id="tbl_antrians" value="antrians (Data Tiket Antrian)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#047857;strokeColor=#065f46;fontColor=#ffffff;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="540" y="100" width="340" height="344" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_1" value="+ id : BIGINT UNSIGNED [PK]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="30" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_2" value="  nomor_urut : INT UNSIGNED" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;fontStyle=1;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="56" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_3" value="  kode_antrian : VARCHAR(20) [A-001, A-002]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;fontStyle=1;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="82" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_4" value="  nama_pasien : VARCHAR(255)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="108" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_5" value="  jenis_poli : VARCHAR(50) = 'Poli Umum'" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="134" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_6" value="  status : ENUM('menunggu','dipanggil','selesai','dilewati')" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#047857;fontStyle=1;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="160" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_7" value="  tanggal_antrian : DATE [INDEX]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="186" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_8" value="# diinput_oleh : BIGINT UNSIGNED [FK -> users.id]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#2563eb;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="212" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_9" value="# dilayani_oleh : BIGINT UNSIGNED [FK -> users.id]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#2563eb;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="238" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_10" value="  waktu_dipanggil : TIMESTAMP NULL" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="264" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_11" value="  created_at / updated_at : TIMESTAMP" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="290" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a_col_12" value="  UNIQUE KEY: (tanggal_antrian, nomor_urut)" style="text;strokeColor=none;fillColor=#fef3c7;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#92400e;fontStyle=2;" vertex="1" parent="tbl_antrians">
+          <mxGeometry y="316" width="340" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- ================= TABEL SESSIONS ================= -->
+        <mxCell id="tbl_sessions" value="sessions (Sesi Login Web)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#475569;strokeColor=#334155;fontColor=#ffffff;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="280" height="186" as="geometry" />
+        </mxCell>
+        <mxCell id="s_col_1" value="+ id : VARCHAR(255) [PK]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="tbl_sessions">
+          <mxGeometry y="30" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_col_2" value="# user_id : BIGINT UNSIGNED [FK -> users.id]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#2563eb;" vertex="1" parent="tbl_sessions">
+          <mxGeometry y="56" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_col_3" value="  ip_address : VARCHAR(45)" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_sessions">
+          <mxGeometry y="82" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_col_4" value="  user_agent : TEXT" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_sessions">
+          <mxGeometry y="108" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_col_5" value="  payload : LONGTEXT" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_sessions">
+          <mxGeometry y="134" width="280" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_col_6" value="  last_activity : INT [INDEX]" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_sessions">
+          <mxGeometry y="160" width="280" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- ================= TABEL PASSWORD_RESET_TOKENS ================= -->
+        <mxCell id="tbl_tokens" value="password_reset_tokens" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#64748b;strokeColor=#475569;fontColor=#ffffff;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="540" y="500" width="340" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="t_col_1" value="+ email : VARCHAR(255) [PK]" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=1;fontColor=#0f172a;" vertex="1" parent="tbl_tokens">
+          <mxGeometry y="30" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="t_col_2" value="  token : VARCHAR(255)" style="text;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#334155;" vertex="1" parent="tbl_tokens">
+          <mxGeometry y="56" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="t_col_3" value="  created_at : TIMESTAMP NULL" style="text;strokeColor=none;fillColor=#f8fafc;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontColor=#64748b;" vertex="1" parent="tbl_tokens">
+          <mxGeometry y="82" width="340" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- ================= RELASI (EDGES) ================= -->
+
+        <!-- Relasi 1: users (1) -> antrians.dilayani_oleh (N) -->
+        <mxCell id="rel_melayani" value="1 : N (melayani)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#047857;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#047857;" edge="1" parent="1" source="u_col_1" target="a_col_9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="143" />
+              <mxPoint x="450" y="351" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Relasi 2: users (1) -> antrians.diinput_oleh (N) -->
+        <mxCell id="rel_menginput" value="1 : N (menginput)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;dashed=1;strokeColor=#0f766e;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#0f766e;" edge="1" parent="1" source="u_col_1" target="a_col_8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="143" />
+              <mxPoint x="470" y="325" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Relasi 3: users (1) -> sessions.user_id (N) -->
+        <mxCell id="rel_session" value="1 : N (sesi login)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#475569;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#475569;" edge="1" parent="1" source="tbl_users" target="tbl_sessions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

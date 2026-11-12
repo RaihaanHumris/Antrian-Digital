@@ -35,7 +35,7 @@
             <div class="border-t border-slate-800 pt-5 space-y-2 text-xs">
                 <div class="flex justify-between text-slate-400">
                     <span>Akun Standar</span>
-                    <span class="font-mono-num text-slate-200">admin@medika.id</span>
+                    <span class="font-mono-num text-slate-200">admin@medik.id</span>
                 </div>
                 <div class="flex justify-between text-slate-400">
                     <span>Kata Sandi</span>

@@ -156,7 +156,7 @@
                     <form action="{{ route('panel.antrian.selanjutnya') }}" method="POST">
                         @csrf
                         <button type="submit" class="{{ $antrianAktif ? 'border border-slate-400 bg-slate-900 text-white' : 'bg-emerald-700 hover:bg-emerald-800 text-white' }} text-xs font-bold uppercase tracking-wider px-6 py-3.5 transition">
-                            {{ $antrianAktif ? 'Lanjutkan Next &rarr;' : 'Panggil Antrian &rarr;' }}
+                            {{ $antrianAktif ? 'Lanjutkan Next' : 'Panggil Antrian' }} &rarr;
                         </button>
                     </form>
                 </div>
