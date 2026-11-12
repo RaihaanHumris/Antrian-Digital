@@ -31,22 +31,6 @@
                     Panel kendali pemanggilan nomor antrian pasien, pencatatan poli tujuan, dan pembaruan layar monitor publik secara langsung.
                 </p>
             </div>
-
-            <div class="border-t border-slate-800 pt-5 space-y-2 text-xs">
-                <div class="flex justify-between text-slate-400">
-                    <span>Akun Standar</span>
-                    <span class="font-mono-num text-slate-200">admin@medik.id</span>
-                </div>
-                <div class="flex justify-between text-slate-400">
-                    <span>Kata Sandi</span>
-                    <span class="font-mono-num text-slate-200">password123</span>
-                </div>
-                <button type="button" onclick="isiKredensial()" class="w-full mt-2 border border-slate-700 hover:border-emerald-500 text-emerald-400 font-mono-num text-[11px] uppercase py-2 transition">
-                    [ Klik untuk Isi Otomatis ]
-                </button>
-            </div>
-        </div>
-
         <!-- PANEL KANAN: Form Login -->
         <div class="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between">
             <div>
@@ -84,18 +68,6 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-1">
-                        <label class="inline-flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-                            <input type="checkbox" name="ingat_saya" class="border-slate-300 text-slate-900 focus:ring-0">
-                            <span>Simpan sesi di perangkat ini</span>
-                        </label>
-
-                        <!-- Tombol Isi Cepat khusus layar HP -->
-                        <button type="button" onclick="isiKredensial()" class="lg:hidden font-mono-num text-[11px] text-emerald-700 underline">
-                            Isi Demo Admin
-                        </button>
-                    </div>
-
                     <button type="submit"
                         class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider py-3.5 transition mt-2">
                         Masuk ke Meja Kendali &rarr;
@@ -125,11 +97,6 @@
                 input.type = 'password';
                 btn.textContent = 'LIHAT';
             }
-        }
-
-        function isiKredensial() {
-            document.getElementById('email').value = 'admin@medik.id';
-            document.getElementById('password').value = 'password123';
         }
     </script>
 </body>
