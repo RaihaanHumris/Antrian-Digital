@@ -4,35 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Monitor Antrian — Klinik Kesehatan</title>
+    <title>Monitor Antrian Pasien — Klinik Medika</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-900 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col pb-24 lg:pb-0">
+<body class="bg-[#F8FAFC] text-slate-900 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
 
-    <!-- TOP BAR: Signage Header -->
-    <header class="bg-white border-b border-slate-200 px-4 lg:px-8 h-14 lg:h-16 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 bg-emerald-600"></div>
-            <div class="flex items-baseline gap-2.5">
-                <span class="font-bold tracking-tight text-sm lg:text-base text-slate-900 uppercase">Klinik Kesehatan</span>
-                <span class="hidden sm:inline-block text-xs text-slate-400 font-medium">/ Monitor Antrian Pasien</span>
+    <!-- TOP BAR: Clean Hospital Signage Header -->
+    <header class="bg-white border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between shrink-0 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div class="flex items-center gap-3.5">
+            <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v12m6-6H6"/>
+                </svg>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-extrabold tracking-tight text-base sm:text-lg text-slate-900 uppercase">Klinik Medika</span>
+                    <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        LIVE
+                    </span>
+                </div>
+                <p class="text-[11px] text-slate-500 hidden sm:block">Sistem Informasi &amp; Panggilan Antrian Pasien Terpadu</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs font-mono-num text-slate-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+        <div class="flex items-center gap-3 sm:gap-4">
+            <!-- Digital Clock Badge -->
+            <div class="flex items-center gap-2 bg-slate-100/90 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-mono-num font-bold text-slate-700 shadow-inner">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                    <polyline points="12 6 12 12 16 14" stroke-width="2"/>
+                </svg>
                 <span id="jam-server">{{ now()->format('H:i:s') }}</span>
             </div>
-            <a href="{{ route('panel.dashboard') }}" class="text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-300 px-3 py-1.5 hover:bg-slate-50 transition">
-                Panel Admin
+
+            <!-- Link to Admin Panel -->
+            <a href="{{ route('panel.dashboard') }}" 
+               class="text-xs font-bold text-slate-700 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-1.5 shadow-sm transition flex items-center gap-1.5">
+                <span>Panel Admin</span>
+                <span class="text-slate-400">&rarr;</span>
             </a>
         </div>
     </header>
@@ -40,112 +62,144 @@
     <!-- MAIN WORKSPACE -->
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 lg:divide-x lg:divide-slate-200 lg:overflow-hidden">
 
-        <!-- KOLOM KIRI: Papan Panggilan Aktif & Form Kiosk Desktop -->
-        <section class="lg:col-span-5 flex flex-col justify-between bg-white p-5 lg:p-8 border-b lg:border-b-0 border-slate-200">
+        <!-- KOLOM KIRI (5/12 Desktop): Papan Panggilan Aktif & Form Tiket -->
+        <section class="lg:col-span-5 flex flex-col justify-between bg-white p-4 sm:p-6 lg:p-8 border-b lg:border-b-0 border-slate-200 space-y-6 lg:space-y-0">
             
-            <!-- Papan Nomor Panggilan Aktif -->
-            <div id="kartu-panggilan" class="border border-slate-900 bg-slate-900 text-white p-6 lg:p-10 flex flex-col justify-between flex-1 transition-colors duration-300">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                    <span class="text-[11px] font-mono-num uppercase tracking-widest text-slate-400">Panggilan Aktif</span>
-                    <span id="teks-info-loket" class="text-xs font-mono-num font-bold uppercase px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <!-- Papan Nomor Panggilan Aktif (Hero Card) -->
+            <div id="kartu-panggilan" class="relative rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 text-white p-6 sm:p-8 lg:p-9 shadow-xl border border-slate-800 flex flex-col justify-between overflow-hidden transition-all duration-300">
+                <!-- Background Accent Glow -->
+                <div class="absolute -right-12 -top-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="flex items-center justify-between border-b border-slate-800/80 pb-4 relative z-10">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="text-[11px] font-mono-num uppercase tracking-widest text-slate-300 font-bold">Nomor Panggilan Aktif</span>
+                    </div>
+                    <span id="teks-info-loket" class="text-xs font-mono-num font-bold uppercase px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm">
                         {{ $antrianSekarang ? 'LOKET UTAMA' : 'STANDBY' }}
                     </span>
                 </div>
 
-                <div class="my-8 lg:my-auto py-4">
-                    <div id="teks-kode-antrian" class="font-mono-num text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white leading-none">
+                <!-- Giant Number Display -->
+                <div class="my-6 sm:my-8 lg:my-auto py-2 text-center relative z-10">
+                    <div id="teks-kode-antrian" class="font-mono-num text-7xl sm:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white drop-shadow-md leading-none">
                         {{ $antrianSekarang ? $antrianSekarang->kode_antrian : '---' }}
                     </div>
-                    <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
-                        <div>
-                            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Nama Pasien</span>
-                            <p id="teks-nama-pasien" class="text-base lg:text-xl font-semibold text-slate-100 mt-0.5">
+
+                    <div class="mt-5 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <div class="text-center sm:text-left">
+                            <span class="block text-[10px] uppercase font-bold tracking-wider text-slate-400">Nama Pasien</span>
+                            <p id="teks-nama-pasien" class="text-lg lg:text-xl font-bold text-slate-100 tracking-tight mt-0.5">
                                 {{ $antrianSekarang ? $antrianSekarang->nama_pasien : 'Belum ada panggilan aktif' }}
                             </p>
                         </div>
-                        <span id="teks-poli-aktif" class="text-xs font-mono-num text-slate-300 border border-slate-700 px-2.5 py-1">
+                        <span id="teks-poli-aktif" class="text-xs font-mono-num font-bold text-emerald-300 bg-slate-800/90 border border-slate-700 px-3 py-1 rounded-lg">
                             {{ $antrianSekarang ? ($antrianSekarang->jenis_poli ?? 'Poli Umum') : '-' }}
                         </span>
                     </div>
                 </div>
 
-                <!-- Statistik Ringkas Bawah Papan -->
-                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800 text-xs">
+                <!-- Mini Footer Status -->
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800/80 text-xs relative z-10">
                     <div>
-                        <span class="text-slate-400 block">Antrian Menunggu</span>
-                        <span id="angka-menunggu" class="font-mono-num text-lg font-bold text-white">{{ $jumlahMenunggu ?? 0 }}</span>
+                        <span class="text-slate-400 block text-[11px] font-medium">Antrian Menunggu</span>
+                        <span id="angka-menunggu" class="font-mono-num text-2xl font-extrabold text-white mt-0.5 block">
+                            {{ $jumlahMenunggu ?? 0 }} <span class="text-xs font-normal text-slate-400">pasien</span>
+                        </span>
                     </div>
-                    <div class="text-right">
-                        <span class="text-slate-400 block">Pembaruan</span>
-                        <span class="font-mono-num text-emerald-400 font-semibold">Otomatis / 2 dtk</span>
+                    <div class="text-right flex flex-col justify-end">
+                        <span class="text-slate-400 block text-[11px] font-medium">Sinkronisasi</span>
+                        <span class="font-mono-num text-emerald-400 font-bold text-xs flex items-center justify-end gap-1 mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Otomatis 2 dtk
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- FORM AMBIL TIKET MANDIRI (Desktop) -->
-            <div class="hidden lg:block mt-6 pt-6 border-t border-slate-200">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Registrasi Mandiri (Kiosk)</h2>
-                    <span class="text-[11px] text-slate-400">Cetak nomor instan</span>
+            <!-- Form Ambil Tiket Mandiri (In-Page Card: Responsif Mobile & Desktop) -->
+            <div class="bg-slate-50/80 rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3.5">
+                    <div>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                            </svg>
+                            Ambil Nomor Antrian Mandiri
+                        </h2>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Silakan ketik nama Anda dan pilih poli layanan tujuan</p>
+                    </div>
+                    <span class="hidden sm:inline-block text-[11px] font-mono-num text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded font-bold">GRATIS</span>
                 </div>
 
-                <form id="form-ambil-desktop" class="grid grid-cols-12 gap-2.5">
-                    <input type="text" id="nama_pasien_desktop" placeholder="Nama lengkap pasien..." required
-                        class="col-span-5 border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm focus:bg-white focus:outline-none focus:border-slate-900">
+                <form id="form-ambil-tiket" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                    <input type="text" id="input_nama_pasien" placeholder="Masukkan nama lengkap Anda..." required
+                        class="sm:col-span-5 border border-slate-300 rounded-xl bg-white px-3.5 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 shadow-sm transition">
                     
-                    <select id="jenis_poli_desktop" class="col-span-4 border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:border-slate-900">
+                    <select id="input_jenis_poli" class="sm:col-span-4 border border-slate-300 rounded-xl bg-white px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 shadow-sm transition">
                         <option value="Poli Umum">Poli Umum</option>
                         <option value="Poli Gigi">Poli Gigi</option>
                         <option value="Poli Anak">Poli Anak</option>
                         <option value="Farmasi / Obat">Farmasi / Obat</option>
                     </select>
 
-                    <button type="submit" class="col-span-3 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs uppercase tracking-wider px-4 py-2.5 transition">
-                        + Ambil Tiket
+                    <button type="submit" id="btn-ambil-tiket" class="sm:col-span-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider py-3 sm:py-2.5 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Cetak Tiket</span>
                     </button>
                 </form>
             </div>
 
         </section>
 
-        <!-- KOLOM KANAN: Daftar Antrian (Tabel Desktop / Card List Mobile) -->
+        <!-- KOLOM KANAN (7/12 Desktop): Urutan Daftar Antrian -->
         <section class="lg:col-span-7 flex flex-col bg-[#F8FAFC] lg:overflow-hidden">
             
-            <div class="px-4 lg:px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
+            <!-- Table Header Bar -->
+            <div class="px-5 sm:px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                 <div>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-800">Daftar Urutan Antrian</h2>
-                    <p class="text-xs text-slate-500">Data diperbarui secara langsung tanpa muat ulang halaman</p>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-900">Daftar Antrian Hari Ini</h2>
+                    <p class="text-xs text-slate-500">Monitor urutan giliran pasien secara otomatis</p>
                 </div>
-                <span class="text-xs font-mono-num text-slate-500">{{ now()->format('d/m/Y') }}</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono-num font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md">
+                        {{ now()->format('d/m/Y') }}
+                    </span>
+                </div>
             </div>
 
-            <!-- 1. TAMPILAN DESKTOP -->
-            <div class="hidden lg:block flex-1 overflow-y-auto bg-white">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-100 border-b border-slate-200 text-[11px] font-mono-num uppercase text-slate-500 sticky top-0">
+            <!-- 1. TAMPILAN DESKTOP: Tabel Modern & Rapi -->
+            <div class="hidden lg:block flex-1 overflow-y-auto bg-white custom-scrollbar">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead class="bg-slate-50/90 border-b border-slate-200 text-[11px] font-mono-num uppercase text-slate-500 sticky top-0 z-10 backdrop-blur-sm">
                         <tr>
-                            <th class="py-3 px-6 w-32">Kode</th>
+                            <th class="py-3 px-6 w-28">No. Tiket</th>
                             <th class="py-3 px-6">Nama Pasien</th>
-                            <th class="py-3 px-6 w-40">Unit / Poli</th>
+                            <th class="py-3 px-6 w-44">Unit Poli</th>
                             <th class="py-3 px-6 w-36">Status</th>
-                            <th class="py-3 px-6 w-28 text-right">Pukul</th>
+                            <th class="py-3 px-6 w-28 text-right">Jam Panggil</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel-antrian-desktop" class="divide-y divide-slate-200 text-sm">
+                    <tbody id="tabel-antrian-desktop" class="divide-y divide-slate-100">
                         @forelse($daftarAntrian as $item)
-                            <tr class="{{ $item->status === 'dipanggil' ? 'bg-emerald-50/90 font-semibold' : 'hover:bg-slate-50' }}">
+                            <tr class="{{ $item->status === 'dipanggil' ? 'bg-emerald-50/80 font-semibold border-l-4 border-l-emerald-600' : 'hover:bg-slate-50/80' }} transition">
                                 <td class="py-3.5 px-6 font-mono-num font-bold text-slate-900">{{ $item->kode_antrian }}</td>
-                                <td class="py-3.5 px-6 text-slate-800">{{ $item->nama_pasien }}</td>
-                                <td class="py-3.5 px-6 text-xs text-slate-600">{{ $item->jenis_poli ?? 'Poli Umum' }}</td>
+                                <td class="py-3.5 px-6 text-slate-800 font-medium">{{ $item->nama_pasien }}</td>
+                                <td class="py-3.5 px-6 text-xs text-slate-600">
+                                    <span class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[11px] font-medium">{{ $item->jenis_poli ?? 'Poli Umum' }}</span>
+                                </td>
                                 <td class="py-3.5 px-6">
                                     @if($item->status === 'dipanggil')
-                                        <span class="inline-block font-mono-num text-[11px] font-bold uppercase px-2 py-0.5 bg-emerald-600 text-white">DIPANGGIL</span>
+                                        <span class="inline-flex items-center gap-1 font-mono-num text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> DIPANGGIL
+                                        </span>
                                     @elseif($item->status === 'menunggu')
-                                        <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>
+                                        <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>
                                     @elseif($item->status === 'selesai')
-                                        <span class="inline-block font-mono-num text-[11px] uppercase px-2 py-0.5 bg-slate-100 text-slate-500">SELESAI</span>
+                                        <span class="inline-block font-mono-num text-[11px] font-medium uppercase px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">SELESAI</span>
                                     @else
-                                        <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-rose-100 text-rose-800">DILEWATI</span>
+                                        <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800">DILEWATI</span>
                                     @endif
                                 </td>
                                 <td class="py-3.5 px-6 text-right font-mono-num text-xs text-slate-500">
@@ -154,38 +208,40 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-12 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</td>
+                                <td colspan="5" class="py-16 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <!-- 2. TAMPILAN MOBILE -->
+            <!-- 2. TAMPILAN MOBILE: Kartu Antrian Rapi & Jelas -->
             <div id="list-antrian-mobile" class="lg:hidden p-4 space-y-2.5">
                 @forelse($daftarAntrian as $item)
-                    <div class="border {{ $item->status === 'dipanggil' ? 'border-l-4 border-l-emerald-600 border-slate-300 bg-emerald-50/40' : 'border-slate-200 bg-white' }} p-3.5 flex items-center justify-between">
+                    <div class="rounded-xl border {{ $item->status === 'dipanggil' ? 'border-l-4 border-l-emerald-600 border-slate-300 bg-emerald-50/50 shadow-sm' : 'border-slate-200 bg-white' }} p-4 flex items-center justify-between shadow-xs">
                         <div class="flex items-center gap-3.5">
-                            <span class="font-mono-num text-lg font-extrabold text-slate-900">{{ $item->kode_antrian }}</span>
+                            <span class="font-mono-num text-xl font-extrabold text-slate-900">{{ $item->kode_antrian }}</span>
                             <div>
-                                <p class="text-sm font-semibold text-slate-800 leading-tight">{{ $item->nama_pasien }}</p>
-                                <span class="text-[11px] text-slate-500">{{ $item->jenis_poli ?? 'Poli Umum' }}</span>
+                                <p class="text-sm font-bold text-slate-800 leading-tight">{{ $item->nama_pasien }}</p>
+                                <span class="text-[11px] text-slate-500 font-medium">{{ $item->jenis_poli ?? 'Poli Umum' }}</span>
                             </div>
                         </div>
                         <div>
                             @if($item->status === 'dipanggil')
-                                <span class="inline-block font-mono-num text-[11px] font-bold uppercase px-2 py-0.5 bg-emerald-600 text-white">DIPANGGIL</span>
+                                <span class="inline-flex items-center gap-1 font-mono-num text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-600 text-white">
+                                    DIPANGGIL
+                                </span>
                             @elseif($item->status === 'menunggu')
-                                <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>
+                                <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>
                             @elseif($item->status === 'selesai')
-                                <span class="inline-block font-mono-num text-[11px] uppercase px-2 py-0.5 bg-slate-100 text-slate-500">SELESAI</span>
+                                <span class="inline-block font-mono-num text-[11px] font-medium uppercase px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">SELESAI</span>
                             @else
-                                <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-rose-100 text-rose-800">DILEWATI</span>
+                                <span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800">DILEWATI</span>
                             @endif
                         </div>
                     </div>
                 @empty
-                    <div class="py-10 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</div>
+                    <div class="py-12 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</div>
                 @endforelse
             </div>
 
@@ -193,69 +249,18 @@
 
     </main>
 
-    <!-- STICKY BOTTOM BAR (Mobile) -->
-    <div class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-300 p-3 z-30 flex items-center justify-between gap-3">
-        <div class="pl-1">
-            <span class="block text-[10px] uppercase tracking-wider text-slate-400">Ingin Berobat?</span>
-            <span class="text-xs font-bold text-slate-800">Daftar nomor antrian dari HP</span>
-        </div>
-        <button type="button" onclick="bukaModalMobile(true)" class="bg-slate-900 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 shrink-0">
-            + Ambil Nomor
-        </button>
-    </div>
-
-    <!-- Modal Drawer Mobile -->
-    <div id="modal-ambil-mobile" class="lg:hidden fixed inset-0 bg-slate-900/60 z-40 hidden items-end">
-        <div class="bg-white w-full p-5 border-t-2 border-slate-900">
-            <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200">
-                <h3 class="text-sm font-bold uppercase tracking-wider">Ambil Nomor Antrian</h3>
-                <button type="button" onclick="bukaModalMobile(false)" class="text-xs font-mono-num text-slate-500 px-2 py-1 border border-slate-200">TUTUP [X]</button>
-            </div>
-            <form id="form-ambil-mobile" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Nama Pasien</label>
-                    <input type="text" id="nama_pasien_mobile" required placeholder="Masukkan nama lengkap"
-                        class="w-full border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-slate-900">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Pilih Unit Layanan</label>
-                    <select id="jenis_poli_mobile" class="w-full border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:border-slate-900">
-                        <option value="Poli Umum">Poli Umum</option>
-                        <option value="Poli Gigi">Poli Gigi</option>
-                        <option value="Poli Anak">Poli Anak</option>
-                        <option value="Farmasi / Obat">Farmasi / Obat</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider py-3.5 mt-2">
-                    Cetak Nomor Antrian Sekarang
-                </button>
-            </form>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let kodeTerakhirDipanggil = null;
 
-        function bukaModalMobile(tampil) {
-            const modal = document.getElementById('modal-ambil-mobile');
-            if (tampil) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-
         function labelStatus(status) {
-            const info = {
-                'dipanggil': '<span class="inline-block font-mono-num text-[11px] font-bold uppercase px-2 py-0.5 bg-emerald-600 text-white">DIPANGGIL</span>',
-                'menunggu': '<span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>',
-                'selesai': '<span class="inline-block font-mono-num text-[11px] uppercase px-2 py-0.5 bg-slate-100 text-slate-500">SELESAI</span>',
-                'dilewati': '<span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2 py-0.5 bg-rose-100 text-rose-800">DILEWATI</span>'
+            const peta = {
+                'dipanggil': '<span class="inline-flex items-center gap-1 font-mono-num text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> DIPANGGIL</span>',
+                'menunggu': '<span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">MENUNGGU</span>',
+                'selesai': '<span class="inline-block font-mono-num text-[11px] font-medium uppercase px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">SELESAI</span>',
+                'dilewati': '<span class="inline-block font-mono-num text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800">DILEWATI</span>'
             };
-            return info[status] || status;
+            return peta[status] || status;
         }
 
         async function muatDataAntrian() {
@@ -268,7 +273,7 @@
                 const data = await respon.json();
 
                 document.getElementById('jam-server').textContent = data.jam_server;
-                document.getElementById('angka-menunggu').textContent = data.jumlah_menunggu;
+                document.getElementById('angka-menunggu').innerHTML = `${data.jumlah_menunggu} <span class="text-xs font-normal text-slate-400">pasien</span>`;
 
                 const elKode = document.getElementById('teks-kode-antrian');
                 const elPasien = document.getElementById('teks-nama-pasien');
@@ -276,7 +281,7 @@
                 const elLoket = document.getElementById('teks-info-loket');
                 const elKartu = document.getElementById('kartu-panggilan');
 
-                // Saat ada nomor yang sedang DIPANGGIL, langsung tampilkan di layar publik
+                // Saat ada nomor yang sedang DIPANGGIL
                 if (data.antrian_sekarang) {
                     elKode.textContent = data.antrian_sekarang.kode_antrian;
                     elPasien.textContent = data.antrian_sekarang.nama_pasien || 'Pasien Umum';
@@ -285,12 +290,8 @@
 
                     if (kodeTerakhirDipanggil !== data.antrian_sekarang.kode_antrian) {
                         kodeTerakhirDipanggil = data.antrian_sekarang.kode_antrian;
-                        elKartu.classList.remove('bg-slate-900');
-                        elKartu.classList.add('bg-emerald-900');
-                        setTimeout(() => {
-                            elKartu.classList.remove('bg-emerald-900');
-                            elKartu.classList.add('bg-slate-900');
-                        }, 1200);
+                        elKartu.classList.add('ring-4', 'ring-emerald-500/60');
+                        setTimeout(() => elKartu.classList.remove('ring-4', 'ring-emerald-500/60'), 1500);
                     }
                 } else {
                     elKode.textContent = '---';
@@ -305,7 +306,7 @@
                 const listMobile = document.getElementById('list-antrian-mobile');
 
                 if (data.daftar_antrian.length === 0) {
-                    const kosongHtml = `<div class="py-12 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</div>`;
+                    const kosongHtml = `<div class="py-16 text-center text-slate-400 text-xs font-mono-num">BELUM ADA DATA ANTRIAN HARI INI</div>`;
                     tabelDesktop.innerHTML = `<tr><td colspan="5">${kosongHtml}</td></tr>`;
                     listMobile.innerHTML = kosongHtml;
                     return;
@@ -313,16 +314,18 @@
 
                 // 1. Isi Tabel Desktop
                 tabelDesktop.innerHTML = data.daftar_antrian.map(item => {
-                    const barisAktif = item.status === 'dipanggil' ? 'bg-emerald-50/90 font-semibold' : 'hover:bg-slate-50';
+                    const barisAktif = item.status === 'dipanggil' ? 'bg-emerald-50/80 font-semibold border-l-4 border-l-emerald-600' : 'hover:bg-slate-50/80';
                     const jamPanggil = item.waktu_dipanggil
                         ? new Date(item.waktu_dipanggil).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                         : '--:--';
 
                     return `
-                        <tr class="${barisAktif}">
+                        <tr class="${barisAktif} transition">
                             <td class="py-3.5 px-6 font-mono-num font-bold text-slate-900">${item.kode_antrian}</td>
-                            <td class="py-3.5 px-6 text-slate-800">${item.nama_pasien}</td>
-                            <td class="py-3.5 px-6 text-xs text-slate-600">${item.jenis_poli || 'Poli Umum'}</td>
+                            <td class="py-3.5 px-6 text-slate-800 font-medium">${item.nama_pasien}</td>
+                            <td class="py-3.5 px-6 text-xs text-slate-600">
+                                <span class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[11px] font-medium">${item.jenis_poli || 'Poli Umum'}</span>
+                            </td>
                             <td class="py-3.5 px-6">${labelStatus(item.status)}</td>
                             <td class="py-3.5 px-6 text-right font-mono-num text-xs text-slate-500">${jamPanggil}</td>
                         </tr>
@@ -332,16 +335,16 @@
                 // 2. Isi Kartu Mobile
                 listMobile.innerHTML = data.daftar_antrian.map(item => {
                     const borderAktif = item.status === 'dipanggil'
-                        ? 'border-l-4 border-l-emerald-600 border-slate-300 bg-emerald-50/40'
+                        ? 'border-l-4 border-l-emerald-600 border-slate-300 bg-emerald-50/50 shadow-sm'
                         : 'border-slate-200 bg-white';
 
                     return `
-                        <div class="border ${borderAktif} p-3.5 flex items-center justify-between">
+                        <div class="rounded-xl border ${borderAktif} p-4 flex items-center justify-between shadow-xs">
                             <div class="flex items-center gap-3.5">
-                                <span class="font-mono-num text-lg font-extrabold text-slate-900">${item.kode_antrian}</span>
+                                <span class="font-mono-num text-xl font-extrabold text-slate-900">${item.kode_antrian}</span>
                                 <div>
-                                    <p class="text-sm font-semibold text-slate-800 leading-tight">${item.nama_pasien}</p>
-                                    <span class="text-[11px] text-slate-500">${item.jenis_poli || 'Poli Umum'}</span>
+                                    <p class="text-sm font-bold text-slate-800 leading-tight">${item.nama_pasien}</p>
+                                    <span class="text-[11px] text-slate-500 font-medium">${item.jenis_poli || 'Poli Umum'}</span>
                                 </div>
                             </div>
                             <div>${labelStatus(item.status)}</div>
@@ -373,50 +376,59 @@
         }
 
         function tampilkanErrorAntrian(kesalahan) {
-            Swal.fire({
-                title: 'Gagal mengambil nomor',
-                text: kesalahan.message || 'Terjadi kesalahan. Silakan coba lagi.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-            });
+            const pesan = kesalahan.message || 'Terjadi kesalahan saat mengambil tiket.';
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Gagal Mengambil Nomor',
+                    text: pesan,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#e11d48'
+                });
+            } else {
+                alert('Gagal Mengambil Nomor: ' + pesan);
+            }
         }
 
         function tampilkanNomorAntrian(hasil) {
-            Swal.fire({
-                title: 'Nomor berhasil diambil',
-                text: `Nomor antrian Anda ${hasil.data.kode_antrian}.`,
-                icon: 'success',
-                confirmButtonText: 'OK',
-            });
+            const kode = hasil.data?.kode_antrian || 'Berhasil';
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Nomor Berhasil Diambil!',
+                    html: `Nomor antrian Anda: <b class="font-mono text-xl text-emerald-700">${kode}</b>.<br><span class="text-sm text-slate-500">Silakan menunggu panggilan petugas loket.</span>`,
+                    icon: 'success',
+                    confirmButtonText: 'Tutup',
+                    confirmButtonColor: '#059669'
+                });
+            } else {
+                alert(`Nomor Berhasil Diambil!\nNomor antrian Anda: ${kode}. Silakan menunggu panggilan.`);
+            }
         }
 
-        document.getElementById('form-ambil-desktop').addEventListener('submit', async function (e) {
+        // Listener form ambil tiket
+        document.getElementById('form-ambil-tiket').addEventListener('submit', async function (e) {
             e.preventDefault();
-            const namaEl = document.getElementById('nama_pasien_desktop');
-            const poliEl = document.getElementById('jenis_poli_desktop');
+            const btn = document.getElementById('btn-ambil-tiket');
+            const namaEl = document.getElementById('input_nama_pasien');
+            const poliEl = document.getElementById('input_jenis_poli');
+
+            const teksAsli = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="inline-block animate-spin mr-1">&#8635;</span> <span>Memproses...</span>';
+
             try {
                 const hasil = await kirimAntrianBaru(namaEl.value, poliEl.value);
                 namaEl.value = '';
                 tampilkanNomorAntrian(hasil);
             } catch (kesalahan) {
                 tampilkanErrorAntrian(kesalahan);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = teksAsli;
             }
         });
 
-        document.getElementById('form-ambil-mobile').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const namaEl = document.getElementById('nama_pasien_mobile');
-            const poliEl = document.getElementById('jenis_poli_mobile');
-            try {
-                const hasil = await kirimAntrianBaru(namaEl.value, poliEl.value);
-                namaEl.value = '';
-                bukaModalMobile(false);
-                tampilkanNomorAntrian(hasil);
-            } catch (kesalahan) {
-                tampilkanErrorAntrian(kesalahan);
-            }
-        });
-
+        // Polling otomatis setiap 2 detik
         muatDataAntrian();
         setInterval(muatDataAntrian, 2000);
     </script>
